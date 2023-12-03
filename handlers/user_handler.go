@@ -56,8 +56,24 @@ func (handler *UserHandler) GetAllUsers(c *gin.Context) {
 }
 
 // LoginUser implements interfaces.UserHandler.
-func (*UserHandler) LoginUser(c *gin.Context) {
-	panic("unimplemented")
+func (handler *UserHandler) LoginUser(c *gin.Context) {
+	var (
+		requestId = uuid.NewString()
+		ctx       = context.WithValue(c.Request.Context(), "request_id", requestId)
+		login     *req.UserLogin
+	)
+	if err := c.ShouldBind(&login); err != nil {
+		return
+	}
+	userRes, err := handler.usecase.LoginUser(ctx, login)
+	if err != nil {
+		return
+	}
+	resp := &res.Response{
+		Message: "Success to login user",
+		Data:    userRes,
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 // RegisterUser implements interfaces.UserHandler.

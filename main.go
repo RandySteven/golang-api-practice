@@ -13,16 +13,21 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func init() {
+}
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("no env got")
 	}
+
 	r := gin.Default()
 	r.ContextWithFallback = true
 
 	v1 := r.Group("/v1")
 	handler := InitHandlers()
 	v1.POST("/register", handler.UserHandler.RegisterUser)
+	v1.POST("/login", handler.UserHandler.LoginUser)
 	handler.CallRouters(v1)
 
 	srv := http.Server{
