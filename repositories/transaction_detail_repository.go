@@ -12,6 +12,20 @@ import (
 
 type transactionDetailRepository struct{}
 
+// GetTransactionsBasedTransactionID implements interfaces.TransactionDetailRepository.
+func (*transactionDetailRepository) GetTransactionsBasedTransactionID(ctx context.Context, tx *gorm.DB, transactionID uint) ([]models.TransactionDetail, error) {
+	var details []models.TransactionDetail
+	err := tx.WithContext(ctx).
+		Model(&models.TransactionDetail{}).
+		Where("transaction_id = ? ", transactionID).
+		Find(&details).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return details, nil
+}
+
 // Find implements interfaces.TransactionDetailRepository.
 func (*transactionDetailRepository) Find(ctx context.Context, tx *gorm.DB) ([]models.TransactionDetail, error) {
 	panic("unimplemented")

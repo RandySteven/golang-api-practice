@@ -7,6 +7,8 @@ import (
 	"test-api/entities/payload/res"
 	"test-api/interfaces"
 	"test-api/repositories"
+	"test-api/utils"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -22,6 +24,7 @@ type transactionUsecase struct {
 // PurchaseProduct implements interfaces.TransactionUsecase.
 func (usecase *transactionUsecase) PurchaseProduct(ctx context.Context, req *req.TransactionRequest) (*res.TransactionResponse, error) {
 	tx := usecase.db.Begin()
+	defer utils.CommitRollback(tx)
 	var res *res.TransactionResponse
 
 	user, err := usecase.userRepo.GetById(ctx, tx, req.UserID)
@@ -30,7 +33,8 @@ func (usecase *transactionUsecase) PurchaseProduct(ctx context.Context, req *req
 	}
 
 	transaction := &models.Transaction{
-		UserID: user.ID,
+		UserID:          user.ID,
+		TransactionDate: time.Now(),
 	}
 
 	transaction, err = usecase.transactionRepo.Save(ctx, tx, transaction)
@@ -61,9 +65,10 @@ func (usecase *transactionUsecase) PurchaseProduct(ctx context.Context, req *req
 		if err != nil {
 			return nil, err
 		}
+		detailRes := utils.TransactionDetailResponse(transactionDetail)
+		res.Details = append(res.Details, *detailRes)
 	}
 
-	tx.Commit()
 	return res, nil
 }
 

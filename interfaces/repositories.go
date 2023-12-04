@@ -30,5 +30,6 @@ type (
 
 	TransactionDetailRepository interface {
 		Repository[models.TransactionDetail]
+		GetTransactionsBasedTransactionID(ctx context.Context, tx *gorm.DB, transactionID uint) ([]models.TransactionDetail, error)
 	}
 )

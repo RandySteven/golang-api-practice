@@ -14,4 +14,6 @@ type TransactionDetail struct {
 	CreatedAt     time.Time `gorm:"not null;default:current_timestamp"`
 	UpdatedAt     time.Time `gorm:"not null;default:current_timestamp"`
 	DeletedAt     gorm.DeletedAt
+	Product       Product     `gorm:"foreignKey:ProductID;references:ID"`
+	Transaction   Transaction `gorm:"foreignKey:TransactionID;references:ID"`
 }
